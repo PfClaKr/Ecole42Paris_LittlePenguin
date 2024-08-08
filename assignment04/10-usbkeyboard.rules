@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="usb", RUN="/usr/sbin/insmod /home/ychun/rendu/assignment04/main.ko
