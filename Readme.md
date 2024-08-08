@@ -72,6 +72,36 @@ First off, I’d suggest printing out a copy of the GNU coding standards, and NO
 ```
 ~~직접해볼까 고민한 1인~~
 ## Assignment04
+01에서 작성했던 간단한 커널모듈을 가지고 usb keyboard가 인식되었을때 작동하는 모듈을 작성해야한다.
+대부분의 리눅스는 유저스페이스 핫플러그로 udev를 쓰므로 udev 기준 풀이이다.
+```sh
+$ lsusb -D /dev/bus/usb/001/001
+Device: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               2.00
+  bDeviceClass            9 Hub
+  bDeviceSubClass         0 
+  bDeviceProtocol         1 Single TT
+  bMaxPacketSize0        64 
+  ...
+```
+lsusb로 usb의 descriptor을 확인해서 정보를 얻거나,
+```sh
+$ udevadm monitor
+KERNEL[28004.073393] add      /devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/VMBUS:00/dc4ec6d5-5597-11ef-8a45-085bd6c6f50b (vmbus)
+KERNEL[28004.074159] bind     /devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/VMBUS:00/dc4ec6d5-5597-11ef-8a45-085bd6c6f50b (vmbus)
+...
+```
+udevadm monitor 명령어로 커널 이벤트를 직접 확인해가며 정보를 얻을 수도 있다. \
+\
+/etc/udev/rules.d/ 에 udev관련 유저용 규칙파일을 넣을수있다. [자세한 규칙파일(.rules) 문법은 여기에서](https://www.reactivated.net/writing_udev_rules.html).
+
+모든 usb 디바이스는 종류, 제조사 버전 등등 자신의 정보를 담은 descriptor을 가지고있다. 아까 lsusb로 봤던 Device Descriptor가 그런 내용인 것이다. 그중에서 우리는 bInterfaceProtocol을 써서 usb-keyboard만 걸러주도록하겠다. \
+\
+또한 .rules는 맨앞에 붙는 숫자로 우선순위가 결정된다. 10이 제일 높은 우선순위, 99가 제일 낮은 우선순위이다.
+
 ## Assignment05
 ## Assignment06
 ## Assignment07

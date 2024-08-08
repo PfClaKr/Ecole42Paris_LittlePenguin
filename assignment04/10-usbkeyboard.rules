@@ -1,1 +1,1 @@
-ACTION=="add", SUBSYSTEM=="usb", RUN="/usr/sbin/insmod /home/ychun/rendu/assignment04/main.ko
+ACTION=="add", SUBSYSTEM=="usb", ATTR{bInterfaceProtocol}=="01", RUN="/usr/sbin/insmod /home/ychun/rendu/assignment04/main.ko
