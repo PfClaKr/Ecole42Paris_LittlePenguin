@@ -17,5 +17,3 @@ static void __exit hello_exit(void) {
 
 module_init(hello_init);
 module_exit(hello_exit);
-
-// https://blog.naver.com/jay_korea/30033163575
