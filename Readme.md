@@ -73,8 +73,8 @@ First off, I’d suggest printing out a copy of the GNU coding standards, and NO
 ~~직접해볼까 고민한 1인~~
 ## Assignment04
 01에서 작성했던 간단한 커널모듈을 가지고 usb keyboard가 인식되었을때 작동하는 모듈을 작성해야한다.
-대부분의 리눅스는 유저스페이스 핫플러그로 udev를 쓰므로 udev 기준 풀이이다.
-```sh
+유저스페이스 핫플러그는 udev를 기준으로 풀이하겠다. [출처](https://linuxsleuthing.blogspot.com/2012/08/obtaining-usb-device-details.html)는 여기.
+```bash
 $ lsusb -D /dev/bus/usb/001/001
 Device: ID 1d6b:0002 Linux Foundation 2.0 root hub
 Device Descriptor:
@@ -88,7 +88,7 @@ Device Descriptor:
   ...
 ```
 lsusb로 usb의 descriptor을 확인해서 정보를 얻거나,
-```sh
+```bash
 $ udevadm monitor
 KERNEL[28004.073393] add      /devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/VMBUS:00/dc4ec6d5-5597-11ef-8a45-085bd6c6f50b (vmbus)
 KERNEL[28004.074159] bind     /devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/VMBUS:00/dc4ec6d5-5597-11ef-8a45-085bd6c6f50b (vmbus)
