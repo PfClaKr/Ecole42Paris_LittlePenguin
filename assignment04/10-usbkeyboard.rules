@@ -1,1 +1,2 @@
-ACTION=="add", SUBSYSTEM=="usb", ATTRS{bInterfaceClass}=="03", ATTRS{bInterfaceProtocol}=="01", RUN+="/usr/sbin/insmod /home/ychun/rendu/assignment04/main.ko"
+ACTION=="add", SUBSYSTEM=="usb", ATTR{bInterfaceClass}=="03", ATTR{bInterfaceProtocol}=="01", RUN+="/sbin/insmod /root/main.ko", OWNER="root"
+#ACTION=="add", SUBSYSTEM=="usb", ENV{ID_INPUT_KEYBOARD}=="1", RUN+="/usr/sbin/insmod /root/main.ko"
