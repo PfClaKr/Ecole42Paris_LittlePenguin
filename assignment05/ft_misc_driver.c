@@ -10,11 +10,11 @@ MODULE_DESCRIPTION("ychun made for misc char device driver :)");
 
 #define LOGIN "ychun"
 
-static ssize_t ft_read(struct file *file, char __user *buf, size_t count, loff_t *off) {
+static ssize_t ft_read(struct file *file, char __user *buf, size_t count, loff_t *ppos) {
 	return simple_read_from_buffer(buf, count, ppos, LOGIN, strlen(LOGIN));
 }
 
-static ssize_t ft_write(struct file *file, const char __user *buf, size_t count, loff_t *off) {
+static ssize_t ft_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos) {
 	char input[32];
 	ssize_t len;
 
@@ -36,15 +36,14 @@ static const struct file_operations ft_fops = {
 	.write = ft_write,
 };
 
-static struct miscdevice ft_device = {
-	.minor = MISC_DYNAMIC_MINOR,
-	.name = "fortytwo"
-	.fops = &ft_fops,
-	.mode = 0664, // chmod 664
-};
+static struct miscdevice ft_device;
 
 static int __init ft_init(void) {
 	int	ret;
+
+	ft_device.minor = MISC_DYNAMIC_MINOR;
+	ft_device.name = "fortytwo";
+	ft_device.fops = &ft_fops;
 
 	ret = misc_register(&ft_device);
 	if (ret)
