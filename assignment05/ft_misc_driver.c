@@ -1,0 +1,64 @@
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/miscdevice.h>
+#include <linux/fs.h>
+#include <linux/uaccess.h>
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("ychun");
+MODULE_DESCRIPTION("ychun made for misc char device driver :)");
+
+#define LOGIN "ychun"
+
+static ssize_t ft_read(struct file *file, char __user *buf, size_t count, loff_t *off) {
+	return simple_read_from_buffer(buf, count, ppos, LOGIN, strlen(LOGIN));
+}
+
+static ssize_t ft_write(struct file *file, const char __user *buf, size_t count, loff_t *off) {
+	char input[32];
+	ssize_t len;
+
+	len = simple_write_to_buffer(input, sizeof(input) - 1, ppos, buf, count);
+	if (len < 0)
+		return len;
+
+	input[len] = '\0';
+
+	if (strcmp(input, LOGIN) == 0)
+		return count;
+	else
+		return -EINVAL;
+}
+
+static const struct file_operations ft_fops = {
+	.owner = THIS_MODULE,
+	.read = ft_read,
+	.write = ft_write,
+};
+
+static struct miscdevice ft_device = {
+	.minor = MISC_DYNAMIC_MINOR,
+	.name = "fortytwo"
+	.fops = &ft_fops,
+	.mode = 0664, // chmod 664
+};
+
+static int __init ft_init(void) {
+	int	ret;
+
+	ret = misc_register(&ft_device);
+	if (ret)
+		printk(KERN_ERR "Can not register misc device. name : %s\n", "fortytwo");
+	else
+		printk(KERN_INFO "misc device registed. name : %s\n", "fortytwo");
+
+	return ret;
+}
+
+static void __exit ft_exit(void) {
+	misc_deregister(&ft_device);
+	printk(KERN_INFO "misc device deregisted. name : %s\n", "fortytwo");
+}
+
+module_init(ft_init);
+module_exit(ft_exit);

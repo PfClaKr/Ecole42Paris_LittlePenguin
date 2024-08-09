@@ -100,7 +100,7 @@ udevadm monitor 명령어로 커널 이벤트를 직접 확인해가며 정보�
 
 모든 usb 디바이스는 종류, 제조사 버전 등등 자신의 정보를 담은 descriptor을 가지고있다. 아까 lsusb로 봤던 Device Descriptor가 그런 내용인 것이다. 그중에서 우리는 bInterfaceProtocol을 써서 usb-keyboard만 걸러주도록하겠다. \
 \
-또한 .rules는 맨앞에 붙는 숫자로 우선순위가 결정된다. 10이 제일 높은 우선순위, 99가 제일 낮은 우선순위이다. \
+또한 .rules는 맨앞에 붙는 숫자로 우선순위가 결정된다. 10이 제일 높은 우선순위, 99가 제일 낮은 우선순위이다.
 ```sh
 udevadm control --reload-rules
 dmesg | tail
