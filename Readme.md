@@ -107,7 +107,64 @@ dmesg | tail
 ```
 규칙파일을 적용시켜주고 로그를 확인해보자.
 ## Assignment05
+misc char device driver을 작성, write와 read를 커스텀하는 서브젝트이다.
+
+리눅스는 Unix 시절부터 디바이스 별로 번호를 붙여 관리했다. Major number와 Minor number가 있는데, 자세한내용은 [공식문서](https://www.kernel.org/doc/Documentation/admin-guide/devices.txt)을 참고해보자. \
+
+리눅스에 miscdevice를 등록하기 위해서는 여러 작업이 필요한데, 일단 크게 file_operations을 커스텀 해야된다.
+```c
+/* include/linux/fs.h */
+struct file_operations {
+	struct module *owner;
+	loff_t (*llseek) (struct file *, loff_t, int);
+	ssize_t (*read) (struct file *, char __user *, size_t, loff_t *);
+	ssize_t (*write) (struct file *, const char __user *, size_t, loff_t *);
+	ssize_t (*read_iter) (struct kiocb *, struct iov_iter *);
+	ssize_t (*write_iter) (struct kiocb *, struct iov_iter *);
+	...
+```
+[linux/fs.h](https://lwn.net/2001/0906/a/fs.h.php3#:~:text=struct%20file_operations%20%7B) 안에 정의 되어있는 file_operations을 커스텀하여서 misc device을 읽을 때, 쓸 때, 열 때 등등 여러가지를 커스터마이징 할 수 있다.
+```c
+static struct file_operations ft_fops = {
+  .read = ft_read,
+  .write = ft_write,
+};
+```
+식으로 만들어주고,
+```c
+static struct miscdevice device = {
+  .fops = &ft_fops;
+};
+```
+정도로 적용시키면 되겠다. 참고로 miscdevice는 [이렇게](https://android.googlesource.com/platform/external/kernel-headers/+/froyo/original/linux/miscdevice.h)생겼다.
+
+커널과 유저는 서로 사용하는 영역이 다르다. 그러므로 유저의 인풋을 받거나 아웃풋을 커널에서 보내줘야 한다면 특별한 함수들을 써야한다. 서브젝트가 요구하는건 misc device의 read와 write이므로,
+```c
+/* fs/libfs.c */
+ssize_t simple_write_to_buffer(void *to, size_t available, loff_t *ppos, const void __user *from, size_t count)
+ssize_t simple_read_from_buffer(void __user *to, size_t count, loff_t *ppos, const void *from, size_t available)
+```
+[커널이미지](https://elixir.bootlin.com/linux/v5.17/source/fs/libfs.c#L756)에서 지원하는 함수를 쓰도록 하겠다. \
+테스트 할 때 유의할점은, fd하나로 read와 write을 같이 진행하게 되면, loff_t *ppos 값을 같이 쓰게 되므로 의도한대로 작동하지 않을수 있다. 예를들어
+```c
+int fd = open("42", O_RDWR);
+char buf[6];
+
+write(fd, "ychun", 5);
+int len = read(fd, buf, 5);
+buf[len] = '\0';
+```
+위와 같은 코드를 돌릴 때 나의 기대값은 buf안에 ychun이 들어있는 거지만, 실제로는 write하면서 ppos값이 늘어나 read는 내가 의도치않은 곳을 읽게된다. 이것을 방지하기위해선 close()나 lseek()같이 ppos값을 초기화 할 필요가 있다.
 ## Assignment06
+linux-next커널을 빌드, 부트하면 된다.
+```sh
+git clone git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
+```
+Assignment00, 02와 같은 방식으로 빌드한다.
+
+배포되고 있는 Linux가 릴리즈버전이라면, Linux-next는 베타버전이라고 이해하면 편하다. 회사라면 dev브랜치를 펼치고 관리하겠지만 크기가 크기인만큼 다른 git을 사용하는것처럼 보인다.
+~~서로 백만개가 넘는 커밋이 있는건 비밀~~
 ## Assignment07
 ## Assignment08
 ## Assignment09
+[](https://www.reddit.com/r/linuxquestions/comments/1al9ki2/how_do_you_get_a_complete_boot_log/)

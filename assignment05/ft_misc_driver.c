@@ -17,24 +17,17 @@ static ssize_t ft_read(struct file *file, char __user *buf, size_t count, loff_t
 static ssize_t ft_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos) {
 	char kernel_buf[32];
 	ssize_t len;
-	
-	printk(KERN_INFO "userbuf = %s, %ld\n",buf, ppos);
 
 	len = simple_write_to_buffer(kernel_buf, sizeof(kernel_buf) - 1, ppos, buf, count);
 	if (len < 0)
 		return len;
-
-	printk(KERN_INFO "before null kernel_buf = %s\n", kernel_buf);
 
 	kernel_buf[len] = '\0';
 
 	if (strcmp(kernel_buf, LOGIN) == 0)
 		return count;
 	else
-	{
-		printk(KERN_INFO "%s, %ld\n",kernel_buf, len);
 		return -EINVAL;
-	}
 }
 
 static const struct file_operations ft_fops = {
