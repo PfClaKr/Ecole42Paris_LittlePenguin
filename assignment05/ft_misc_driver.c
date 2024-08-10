@@ -18,7 +18,7 @@ static ssize_t ft_write(struct file *file, const char __user *buf, size_t count,
 	char kernel_buf[32];
 	ssize_t len;
 	
-	printk(KERN_INFO "userbuf = %s, %ld\n",buf, count);
+	printk(KERN_INFO "userbuf = %s, %ld\n",buf, ppos);
 
 	len = simple_write_to_buffer(kernel_buf, sizeof(kernel_buf) - 1, ppos, buf, count);
 	if (len < 0)

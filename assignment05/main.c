@@ -13,24 +13,23 @@ int main() {
     char buffer[BUFFER_SIZE];
     ssize_t bytes_read, bytes_written;
 
-    // 1. Open the device file
     fd = open(DEVICE_PATH, O_RDWR);
     if (fd < 0) {
         perror("Failed to open the device file");
         return errno;
     }
 
-    // 2. Test reading from the device
     bytes_read = read(fd, buffer, BUFFER_SIZE);
     if (bytes_read < 0) {
         perror("Failed to read from the device file");
         close(fd);
         return errno;
     }
-    buffer[bytes_read] = '\0'; // Null-terminate the string
+    buffer[bytes_read] = '\0';
     printf("Read from device: %s\n", buffer);
+    close(fd);
 
-    // 3. Test writing the correct login to the device
+    fd = open(DEVICE_PATH, O_RDWR);
     bytes_written = write(fd, USER_LOGIN, strlen(USER_LOGIN));
     if (bytes_written < 0) {
         perror("Failed to write the correct login to the device file");
@@ -38,8 +37,10 @@ int main() {
         return errno;
     }
     printf("Successfully wrote the correct login to the device.\n");
+    close(fd);
 
-    // 4. Test writing an incorrect login to the device
+
+    fd = open(DEVICE_PATH, O_RDWR);
     bytes_written = write(fd, "wronglogin", strlen("wronglogin"));
     if (bytes_written < 0) {
         perror("Failed to write the incorrect login to the device file");
@@ -47,7 +48,6 @@ int main() {
         printf("Unexpectedly succeeded in writing the incorrect login to the device.\n");
     }
 
-    // 5. Close the device file
     close(fd);
     return 0;
 }
