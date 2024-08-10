@@ -21,8 +21,8 @@ static ssize_t foo_write(struct file *file, const char __user *buf, size_t count
 		return -EINVAL;
 	
 	mutex_lock(&foo_mutex);
-	foo_page_len = count;
 	ret = simple_write_to_buffer(foo_page, PAGE_SIZE, ppos, buf, count);
+	foo_page_len = *ppos;
 	mutex_unlock(&foo_mutex);
 
 	return ret;
@@ -31,4 +31,5 @@ static ssize_t foo_write(struct file *file, const char __user *buf, size_t count
 const struct file_operations foo_fops = {
 	read : foo_read,
 	write : foo_write,
+	llseek : no_llseek,
 };
