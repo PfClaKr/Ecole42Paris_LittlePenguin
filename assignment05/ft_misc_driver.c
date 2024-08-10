@@ -3,6 +3,7 @@
 #include <linux/miscdevice.h>
 #include <linux/fs.h>
 #include <linux/uaccess.h>
+#include <linux/init.h>
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("ychun");
@@ -38,7 +39,7 @@ static const struct file_operations ft_fops = {
 
 static struct miscdevice ft_device;
 
-static int __init ft_init(void) {
+static int __init; ft_init(void) {
 	int	ret;
 
 	ft_device.minor = MISC_DYNAMIC_MINOR;
@@ -54,7 +55,7 @@ static int __init ft_init(void) {
 	return ret;
 }
 
-static void __exit ft_exit(void) {
+static void __exit; ft_exit(void) {
 	misc_deregister(&ft_device);
 	printk(KERN_INFO "misc device deregisted. name : %s\n", "fortytwo");
 }
