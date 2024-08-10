@@ -14,7 +14,7 @@ static ssize_t foo_read(struct file *file, char __user *buf, size_t count, loff_
 	return ret;
 }
 
-static ssize_t foo_write(struct file *file, char __user *buf, size_t count, loff_t *ppos) {
+static ssize_t foo_write(struct file *file, const char __user *buf, size_t count, loff_t *ppos) {
 	ssize_t ret;
 
 	if (count > PAGE_SIZE)
@@ -28,7 +28,7 @@ static ssize_t foo_write(struct file *file, char __user *buf, size_t count, loff
 	return ret;
 }
 
-static const struct file_operations foo_fops = {
+const struct file_operations foo_fops = {
 	read : foo_read,
 	write : foo_write,
 };
