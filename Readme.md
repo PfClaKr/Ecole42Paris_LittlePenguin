@@ -96,7 +96,7 @@ KERNEL[28004.074159] bind     /devices/LNXSYSTM:00/LNXSYBUS:00/ACPI0004:00/VMBUS
 ```
 udevadm monitor 명령어로 커널 이벤트를 직접 확인해가며 정보를 얻을 수도 있다. \
 \
-/etc/udev/rules.d/ 에 udev관련 유저용 규칙파일을 넣을수있다. [자세한 규칙파일(.rules) 문법은 여기에서](https://www.reactivated.net/writing_udev_rules.html).
+/etc/udev/rules.d/ 에 udev관련 유저용 규칙파일을 넣을수있다. [자세한 규칙파일(.rules) 문법은 여기에서](https://www.reactivated.net/writing_udev_rules.html)
 
 모든 usb 디바이스는 종류, 제조사 버전 등등 자신의 정보를 담은 descriptor을 가지고있다. 아까 lsusb로 봤던 Device Descriptor가 그런 내용인 것이다. 그중에서 우리는 bInterfaceProtocol을 써서 usb-keyboard만 걸러주도록하겠다. \
 \
@@ -109,7 +109,7 @@ dmesg | tail
 ## Assignment05
 misc char device driver을 작성, write와 read를 커스텀하는 서브젝트이다.
 
-리눅스는 Unix 시절부터 디바이스 별로 번호를 붙여 관리했다. Major number와 Minor number가 있는데, 자세한내용은 [공식문서](https://www.kernel.org/doc/Documentation/admin-guide/devices.txt)을 참고해보자. \
+리눅스는 Unix 시절부터 디바이스 별로 번호를 붙여 관리했다. Major number와 Minor number가 있는데, 자세한내용은 [공식문서](https://www.kernel.org/doc/Documentation/admin-guide/devices.txt)을 참고해보자.
 
 리눅스에 miscdevice를 등록하기 위해서는 여러 작업이 필요한데, 일단 크게 file_operations을 커스텀 해야된다.
 ```c
@@ -144,7 +144,7 @@ static struct miscdevice device = {
 ssize_t simple_write_to_buffer(void *to, size_t available, loff_t *ppos, const void __user *from, size_t count)
 ssize_t simple_read_from_buffer(void __user *to, size_t count, loff_t *ppos, const void *from, size_t available)
 ```
-[커널이미지](https://elixir.bootlin.com/linux/v5.17/source/fs/libfs.c#L756)에서 지원하는 함수를 쓰도록 하겠다. \
+[커널](https://elixir.bootlin.com/linux/v5.17/source/fs/libfs.c#L756)에서 지원하는 함수를 쓰도록 하겠다. \
 테스트 할 때 유의할점은, fd하나로 read와 write을 같이 진행하게 되면, loff_t *ppos 값을 같이 쓰게 되므로 의도한대로 작동하지 않을수 있다. 예를들어
 ```c
 int fd = open("42", O_RDWR);
@@ -154,7 +154,8 @@ write(fd, "ychun", 5);
 int len = read(fd, buf, 5);
 buf[len] = '\0';
 ```
-위와 같은 코드를 돌릴 때 나의 기대값은 buf안에 ychun이 들어있는 거지만, 실제로는 write하면서 ppos값이 늘어나 read는 내가 의도치않은 곳을 읽게된다. 이것을 방지하기위해선 close()나 lseek()같이 ppos값을 초기화 할 필요가 있다.
+위와 같은 코드를 돌릴 때 나의 기대값은 buf안에 ychun이 들어있는 거지만, 실제로는 write하면서 ppos값이 늘어나 read는 내가 의도치않은 곳을 읽게된다. 이것을 방지하기위해선 close()나 lseek()같이 ppos값을 초기화 할 필요가 있다. \
+[참고](https://karatus.tistory.com/206)
 ## Assignment06
 linux-next커널을 빌드, 부트하면 된다.
 ```sh
