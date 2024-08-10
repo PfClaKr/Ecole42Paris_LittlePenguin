@@ -20,10 +20,10 @@ static void	test_id(void)
 		exit(-1);
 	}
 
-	res = write(fd, "vism", 4);
+	res = write(fd, "wrongid", 7);
 	printf("res - %d\n", res);
 
-	res = write(fd, "vismaily", 8);
+	res = write(fd, "ychun", 5);
 	printf("res - %d\n", res);
 
 	memset(id, 0, 8);
@@ -92,7 +92,7 @@ static void	*thread_routine(void *args)
 		fd = open("/sys/kernel/debug/fortytwo/foo", O_RDONLY);
 		if (fd == -1)
 			pthread_exit(NULL);
-		res = read(fd, foo_buff, 8);
+		res = read(fd, foo_buff, 5);
 		close(fd);
 		printf("foo - read res - %d, %s\n", res, foo_buff);
 	} while (res > 0);
@@ -112,16 +112,16 @@ static void	test_foo(void)
 	if (fd == -1)
 		exit(-1);
 	page_size = sysconf(_SC_PAGESIZE);
-	res = write(fd, "vismaily", 8);
-	printf("foo - write res - %d, vismaily\n", res);
+	res = write(fd, "hello", 5);
+	printf("foo - write res - %d, ychun\n", res);
 	pthread_create(&thread, NULL, thread_routine, &page_size);
 	for (int i = 0; i < 100; i += 8)
 	{
 		usleep(1000);
-		res = write(fd, "vismaily", 8);
-		printf("foo - write res - %d, vismaily\n", res);
-		res = write(fd, "42School", 8);
-		printf("foo - write res - %d, 42School\n", res);
+		res = write(fd, "ychun", 5);
+		printf("foo - write res - %d, ychun\n", res);
+		res = write(fd, "ychun", 5);
+		printf("foo - write res - %d, ychun\n", res);
 	}
 	close(fd);
 }
