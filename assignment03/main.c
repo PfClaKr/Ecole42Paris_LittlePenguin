@@ -8,27 +8,23 @@
 /*
  *  That was a long sleep, tell userspace about it
  */
-int do_work(int *my_int, int retval)
+int do_work(int *my_int)
 {
-	int x;
 	int y = *my_int;
-	int z;
 
-	for (x = 0; x < my_int; ++x)
-		usleep_range(10);
+	for (int i = 0; i < my_int; ++i)
+		usleep_range(0, 10);
 
 	if (y < 10)
 		pr_info("We slept a long time!");
-	z = x * y;
-	return z;
-		return 1;
+	return y * y;
 }
 
 int my_init(void)
 {
 	int x = 10;
 
-	x = do_work(&x, x);
+	x = do_work(&x);
 	return x;
 }
 

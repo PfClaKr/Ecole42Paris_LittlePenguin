@@ -24,7 +24,7 @@ uname -r
 > [v2.3 이전시대 유물](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/linux/module.h?h=v5.7#n75)\
 > 우리는 어떤 시스템에서나 complie이 되어야하기 때문에...
 ### *printk(const char *ftm, ...)*
-커널에 **printk()**는 **printf()**와 닮았지만 사용자공간을 위해 만들지않음.\
+커널에 **printk()** 는 **printf()** 와 닮았지만 사용자공간을 위해 만들지않음.\
 standardout에 작성하지않고 로그작성을 위해 쓰임.\
 [중요순위 매크로](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/linux/kern_levels.h?h=v5.7)
 > ```printk(KERN_INFO "Hello world!\n")```   
@@ -63,7 +63,7 @@ diff -u Makefile.orig Makefile > Makefile.patch
 ```
 ## Assignment03
 00에서 받았던 git폴더안에 linux커널코딩스타일 검사해주는 스크립트가 있다.
-```sh
+```s
 <linux_kernel_raw_source_path>/scripts/checkpatch.pl main.c -no-tree -file --strict
 ```
 리눅스 커널 코딩 스타일 저자가 매우 재미있으니 [원문](https://www.kernel.org/doc/html/latest/process/coding-style.html)을 읽는것을 매우매우 추천.
@@ -166,6 +166,32 @@ Assignment00, 02와 같은 방식으로 빌드한다.
 배포되고 있는 Linux가 릴리즈버전이라면, Linux-next는 베타버전이라고 이해하면 편하다. 회사라면 dev브랜치를 펼치고 관리하겠지만 크기가 크기인만큼 다른 git을 사용하는것처럼 보인다.
 ~~서로 백만개가 넘는 커밋이 있는건 비밀~~
 ## Assignment07
+Linux 에서는 커널 개발자를 위한 여러가지 도구를 지원한다. 우리가 개발하는 환경은 user영역에서 테스트하는경우가 훨씬많은데, 항상 커널영역의 메세지나 로깅 등을 user영역으로 보내는 작업은 많은 노가다를 요구할 것이다. 예를들어, sysfs에서는 하나의 값을 얻기위에 하나의 rules파일이 필요한데, debugfs는 그런거 필요없다고 [공식문서](https://docs.kernel.org/filesystems/debugfs.html) 에서 얘기해준다.
+
+debugfs 모듈 작성도 일반 커널모듈 작성과 크게 다르지않지만, 접근하는 디렉토리와 파일을 만드는 함수들을 사용해 직접 모듈등록을 할 것이다.
+
+**id**는 assignment05와 같다. 서브젝트에서 요구하는 권한설정만 잘 해주도록 하자.
+
+**jiffies**는 시스템에서 사용하는 타이머의 일종이다. 컴퓨터가 켜지고 난 후로 몇 번 tick을 했는지 기록한것인데, tick의 기준은 아키텍쳐에서 정한 HZ, 헤르츠를 토대로 정해진다. 이것을 가지고 여러 프로세서들의 스케쥴링에 중요한 역할을 하게된다. [자세한 내용은 여기로](https://medium.com/pocs/%EB%A6%AC%EB%88%85%EC%8A%A4-%EC%BB%A4%EB%84%90-%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C-%EA%B0%95%EC%9D%98%EB%85%B8%ED%8A%B8-6-9f5be9df434e). \
+jiffies는 운영체제마다 가지고있는 크기가 달라서, 32비트인지 64비트 운영체제인지 확인 후 파일을 만들어 접근할 수 있도록하자.
+
+**foo**는 id와 비슷한 역할을 하지만, 페이지 라는 크기를 가진 저장공간을 가지고 그 안에 write와 read을 하게 된다. 그 와중에 동시에 데이터에 접근하는 상황을 방지하고자 mutex와 함께 구현해야한다. \
+**페이지크기(page_size)** 라는 단어가 처음에는 굉장히 생소했다. 리눅스에서 쓰이는 메모리 관리기법 중 하나이고, 어느 무언가가 메모리를 차지해야된다면 그에대한 최소단위를 페이지라고 하는 것 처럼보인다. 실제로 페이지크기는 아키텍쳐마다 다르지만, 보통 4kb 혹은 8kb라고 한다.
 ## Assignment08
+서브젝트에 주어진 코드를 읽고, linux 코딩 스타일에 맞춰 바꾸면서 이 모듈이 무슨역할을 하는지 알아내고 그에 맞춰 코드를 바꿔야한다. \
+코드 생겨먹은거보면 42 pedago팀이 만들 때 참 재밌었겠구나 싶다. 어떻게든 학생들 괴롭히려고... \
+코딩 스타일은 assignment03에서 쓰던
+```sh
+<linux_kernel_raw_source_path>/scripts/checkpatch.pl main.c -no-tree -file --strict
+```
+명령어로 아무 말이 없을 떄 까지 돌리자. ~~norminette의 부활~~
+```c
+static struct miscdevice myfd_device = {
+		.minor = MISC_DYNAMIC_MINOR,
+		.name = "reverse",
+		.fops = &myfd_fops
+};
+```
+서브젝트에 주어진 miscdevice에 이름을 보면 reverse라고 있는것처럼, write는 잘 저장하고 read할 때 거꾸로 출력하는 misc device 되시겠다. abcd를 넣으면 dcba가 나오는 드라이버다. 코드는 간단하니 천천히 읽고 고쳐주면 쉬어가는 느낌으로 할 수 있을것처럼 보인다.
 ## Assignment09
 [](https://www.reddit.com/r/linuxquestions/comments/1al9ki2/how_do_you_get_a_complete_boot_log/)
