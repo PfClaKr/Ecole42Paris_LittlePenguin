@@ -194,4 +194,17 @@ static struct miscdevice myfd_device = {
 ```
 서브젝트에 주어진 miscdevice에 이름을 보면 reverse라고 있는것처럼, write는 잘 저장하고 read할 때 거꾸로 출력하는 misc device 되시겠다. abcd를 넣으면 dcba가 나오는 드라이버다. 코드는 간단하니 천천히 읽고 고쳐주면 쉬어가는 느낌으로 할 수 있을것처럼 보인다.
 ## Assignment09
+proc 파일시스템에 마운트포인트의 리스트를 보여주는 모듈을 작성하는 문제이다. \
+process들의 정보들을 제공하는 목적으로 만들어진 파일시스템이고, 실제로 
+```bash
+ls /proc
+1 108318  108348  117298  117382  117458  1242  135879  1521    188    20426  20583  290    55370  847  940 bus devices interrupts key mdstat pagetypeinfo  sy vmallocinfo 1004    108319  108349 ...
+```
+여러 프로세스들의 pid와 함께 유저에게 유용한 정보를 알려준다. \
+procfs는 실제로 존재하지않는 가상파일들의 일종이다. 커널이 메모리상에 만들어놓고 저장장치에는 저장하지 않기 때문에 일반적인 ```printf()```는 사용하지 못한다. 읽어들일 버퍼가 없기때문. \
+
+그래서 linux에선 seq_file 인터페이스로 procfs의 정보를 유저에게 표현해준다. seq_file에대한 자세한 정보는 [여기로](https://habr.com/en/articles/444620/) \
+
+구버전 리눅스커널과 현재버전에서 많은 proc 구조변경이 있었다. 우리가 봐야하는 mount리스트도 원래는 연결리스트였지만 rb트리로 바뀌어서 노드 순회탐색을 해야한다. 탐색 후 서브젝트가 요구하는대로 맞춰 출력하면 끝.
+
 [](https://www.reddit.com/r/linuxquestions/comments/1al9ki2/how_do_you_get_a_complete_boot_log/)
